@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CSV to Array Converter</title>
+  <style>
+    /* Styles for the page layout */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #drop_zone {
+      border: 2px dashed #ccc;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #data_box {
+      width: 100%;
+      height: 300px;
+      resize: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSV to Array Converter</h1>
+  <div id="drop_zone">
+    <p>Drop CSV file here or click to upload</p>
+    <input type="file" id="file_input" accept=".csv">
+  </div>
+  <textarea id="data_box" readonly></textarea>
+  <button id="copy_button">Copy Data</button>
+  
+  <script>
+    // JavaScript code to handle file upload and conversion
+    document.getElementById('drop_zone').addEventListener('dragover', handleDragOver, false);
+    document.getElementById('drop_zone').addEventListener('drop', handleFileSelect, false);
+    document.getElementById('file_input').addEventListener('change', handleFileSelect, false);
+    document.getElementById('copy_button').addEventListener('click', copyDataToClipboard);
+
+    function handleDragOver(event) {
+      event.stopPropagation();
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'copy';
+    }
+
+    function handleFileSelect(event) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      var file = event.dataTransfer ? event.dataTransfer.files[0] : event.target.files[0];
+      var reader = new FileReader();
+
+      reader.onload = function(e) {
+        var contents = e.target.result;
+        var rows = contents.split('\n');
+        var data = [];
+
+        for (var i = 0; i < rows.length; i++) {
+          var row = rows[i].trim().split(',');
+          data.push(row);
+        }
+
+        // Display the resulting array in the text box
+        var dataBox = document.getElementById('data_box');
+        dataBox.value = JSON.stringify(data);
+
+        // Enable the "Copy Data" button
+        document.getElementById('copy_button').disabled = false;
+      };
+
+      reader.readAsText(file);
+    }
+
+    function copyDataToClipboard() {
+      var dataBox = document.getElementById('data_box');
+      dataBox.select();
+      document.execCommand('copy');
+    }
+  </script>
+</body>
+</html>
